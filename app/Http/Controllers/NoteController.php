@@ -7,6 +7,7 @@ use App\Models\Note;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
 use App\Models\UE;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -45,16 +46,16 @@ class NoteController extends Controller
      * @param  \App\Http\Requests\StoreNoteRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreNoteRequest $request)
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'notes' => 'array',
             'notes.*.matricule_etudiant' => 'required|exists:etudiants,matricule',
 //            'notes.*.noms_etudiant' => 'required|string|exists:etudiants,noms',
             'notes.*.code_ue' => 'required|exists:u_e_s,code',
-            'notes.*.note_cc' => 'sometimes|decimal',
-            'notes.*.note_tp' => 'sometimes|decimal',
-            'notes.*.note_sn' => 'sometimes|deciaml',
+            'notes.*.cc' => 'sometimes',
+            'notes.*.tp' => 'sometimes',
+            'notes.*.sn' => 'sometimes',
         ]);
 
         if($validator->fails()){
@@ -65,9 +66,10 @@ class NoteController extends Controller
             Note::create([
                 'ue_id' => UE::query()->where('code', $note['code_ue'])->first()->id,
                 'etudiant_id' => Etudiant::query()->where('matricule', $note['matricule_etudiant'])->first()->id,
-                'cc' => $note['note_cc'] ?? null,
-                'tp' => $note['note_tp'] ?? null,
-                'sn' => $note['note_sn'] ?? null,
+                'cc' => $note['cc'] ?? null,
+                'tp' => $note['tp'] ?? null,
+                'sn' => $note['sn'] ?? null,
+                'annee_scolaire' => '2022-2023'
             ]);
         }
 
@@ -126,13 +128,15 @@ class NoteController extends Controller
 
     public function view_index()
     {
+        $ues = UE::all();
         $notes = Note::query()->paginate();
         foreach($notes as $note){
             $note->etudiant = $note->etudiant()->first();
             $note->ue = $note->ue()->first();
         }
         return View::make('pages.importations.notes', [
-            'notes' => $notes
+            'notes' => $notes,
+            'ues' => $ues
         ]);
     }
 }

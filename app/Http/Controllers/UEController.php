@@ -51,6 +51,10 @@ class UEController extends Controller
             'ues.*.code' => 'required|string|between:2,15|unique:u_e_s,code',
             'ues.*.code_classe' => 'required|string|between:2,15|exists:classes,code',
             'ues.*.intitule' => 'required|string|between:3,60',
+            'ues.*.semestre' => 'required|integer',
+            'ues.*.credit' => 'required|integer',
+            'ues.*.ue_optionelle' => 'required|boolean',
+            'ues.*.tp_optionel' => 'required|boolean',
         ]);
 
         if($validator->fails()){
@@ -62,10 +66,10 @@ class UEController extends Controller
                 'code' => $ue['code'],
                 'intitule' => $ue['intitule'],
                 'classe_id' => Classe::query()->where('code', $ue['code_classe'])->first()->id,
-                'semestre' => 1,
-                'credit' => 4,
-                'ue_optionelle' => false,
-                'tp_optionel' => false
+                'semestre' => $ue['semestre'],
+                'credit' => $ue['credit'],
+                'ue_optionelle' => $ue['ue_optionelle'],
+                'tp_optionel' => $ue['tp_optionel']
             ]);
         }
 

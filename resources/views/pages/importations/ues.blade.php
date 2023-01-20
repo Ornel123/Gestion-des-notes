@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <div class="card" id="stored-data-container">
+                <div class="card visually-hidden" id="stored-data-container">
                     <div class="card-body">
                         <h5 class="card-title" style="position: relative;">
                             <button onclick="showSummaryContainer()" style="position: absolute; right: 0;" class="btn btn-outline-danger btn-sm">
@@ -67,6 +67,10 @@
                                         <th scope="col">Code</th>
                                         <th scope="col">Intitulé</th>
                                         <th scope="col">Classe</th>
+                                        <th scope="col">Semestre</th>
+                                        <th scope="col">Crédit</th>
+                                        <th scope="col">Est optionnelle</th>
+                                        <th scope="col">Possède TP</th>
                                         <th scope="col">Actions</th>
                                     </tr>
                                     </thead>
@@ -142,7 +146,7 @@
                                                 </div>
                                             </div>
                                             <div class="row mb-3">
-                                                <label for="code" class="col-sm-2 col-form-label">Intitulé: <span class="text-danger ql-size-huge">*</span></label>
+                                                <label for="intitule" class="col-sm-2 col-form-label">Intitulé: <span class="text-danger ql-size-huge">*</span></label>
                                                 <div class="col-sm-10">
                                                     <input required minlength="3" maxlength="60" id="intitule" name="intitule" type="text" class="form-control" placeholder="Intitulé de la l'UE">
                                                     <div class="invalid-feedback">
@@ -151,7 +155,7 @@
                                                 </div>
                                             </div>
                                             <div class="row mb-3">
-                                                <label for="code" class="col-sm-2 col-form-label">Classe: <span class="text-danger ql-size-huge">*</span></label>
+                                                <label for="code_classe" class="col-sm-2 col-form-label">Classe: <span class="text-danger ql-size-huge">*</span></label>
                                                 <div class="col-sm-10">
                                                     <select id="code_classe" name="code_classe" class="form-select" required>
                                                         <option selected="">De quelle classe est l'ue ?</option>
@@ -161,6 +165,66 @@
                                                     </select>
                                                     <div class="invalid-feedback">
                                                         La classe est requise !
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <label for="semestre" class="col-sm-4 col-form-label">Semestre: <span class="text-danger ql-size-huge">*</span></label>
+                                                        <div class="col-sm-8">
+                                                            <select id="semestre" name="semestre" class="form-select" required>
+                                                                    <option hidden disabled selected="">De quel semestre est l'UE ?</option>
+                                                                <option value="1">1</option>
+                                                                <option value="2">2</option>
+                                                            </select>
+                                                            <div class="invalid-feedback">
+                                                                Ce champ est requis !
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <label for="credit" class="col-sm-4 col-form-label">Crédit: <span class="text-danger ql-size-huge">*</span></label>
+                                                        <div class="col-sm-8">
+                                                            <input required minlength="3" maxlength="60" id="credit" name="credit" type="number" class="form-control" placeholder="Nombre de crédits de l'UE">
+                                                            <div class="invalid-feedback">
+                                                                Le crédit est requis !
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <label for="tp_optionel" class="col-sm-4 col-form-label">TP requis: <span class="text-danger ql-size-huge">*</span></label>
+                                                        <div class="col-sm-8">
+                                                            <select id="tp_optionel" name="tp_optionel" class="form-select" required>
+                                                                <option hidden disabled selected="">L'UE possède-t-elle un TP</option>
+                                                                <option value="false">Oui</option>
+                                                                <option value="true">Non</option>
+                                                            </select>
+                                                            <div class="invalid-feedback">
+                                                                Ce champ est requis !
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <label for="ue_optionelle" class="col-sm-4 col-form-label">Option: <span class="text-danger ql-size-huge">*</span></label>
+                                                        <div class="col-sm-8">
+                                                            <select id="ue_optionelle" name="ue_optionelle" class="form-select" required>
+                                                                <option hidden disabled selected="">L'UE est-elle optionnelle</option>
+                                                                <option value="true">Oui</option>
+                                                                <option value="false">Non</option>
+                                                            </select>
+                                                            <div class="invalid-feedback">
+                                                                Ce champ est requis !
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -189,6 +253,10 @@
                                             <th scope="col">Code</th>
                                             <th scope="col">Intitulé</th>
                                             <th scope="col">Classe</th>
+                                            <th scope="col">Semestre</th>
+                                            <th scope="col">Crédit</th>
+                                            <th scope="col">Est optionnelle</th>
+                                            <th scope="col">Possède TP</th>
                                             <th scope="col">Retirer</th>
                                         </tr>
                                         </thead>
@@ -221,6 +289,7 @@
     <script src="{{ asset('assets/js/importations/ues.js') }}"></script>
     <script>
         console.log({!! json_encode($classes) !!});
+        console.log({!! json_encode($ues) !!});
         makeFirstInitialisation({!! json_encode($ues) !!});
     </script>
 @endsection

@@ -6,6 +6,7 @@ use App\Models\Classe;
 use App\Models\Etudiant;
 use App\Http\Requests\StoreEtudiantRequest;
 use App\Http\Requests\UpdateEtudiantRequest;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -43,13 +44,15 @@ class EtudiantController extends Controller
      * @param  \App\Http\Requests\StoreEtudiantRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreEtudiantRequest $request)
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'etudiants' => 'array',
-            'etudiants.*.code' => 'required|string|between:2,15|unique:ues,code',
+            'etudiants.*.matricule' => 'required|string|between:7,7|unique:etudiants,matricule',
+            'etudiants.*.noms' => 'required|string|between:3,60',
+            'etudiants.*.sexe' => 'required|string',
+            'etudiants.*.date_naissance' => 'required|string',
             'etudiants.*.code_classe' => 'required|string|between:2,15|exists:classes,code',
-            'etudiants.*.intitule' => 'required|string|between:3,60',
         ]);
 
         if($validator->fails()){
@@ -58,8 +61,10 @@ class EtudiantController extends Controller
 
         foreach($request->etudiants as $etd){
             Etudiant::create([
-                'code' => $etd['code'],
-                'intitule' => $etd['intitule'],
+                'matricule' => $etd['matricule'],
+                'noms' => $etd['noms'],
+                'sexe' => $etd['sexe'],
+                'date_naissance' => $etd['date_naissance'],
                 'classe_id' => Classe::query()->where('code', $etd['code_classe'])->first()->id,
             ]);
         }

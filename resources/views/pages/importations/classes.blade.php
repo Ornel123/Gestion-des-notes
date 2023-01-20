@@ -155,7 +155,7 @@
                                                 <label for="code" class="col-sm-2 col-form-label">Filière: <span class="text-danger ql-size-huge">*</span></label>
                                                 <div class="col-sm-10">
                                                     <select id="code_filiere" name="code_filiere" class="form-select" required>
-                                                        <option selected="">De quelle filière est la classe ?</option>
+                                                        <option hidden disabled selected="">De quelle filière est la classe ?</option>
                                                         @foreach($filieres as $filiere)
                                                             <option value="{{$filiere->code}}">{{$filiere->code}}</option>
                                                         @endforeach
@@ -169,7 +169,7 @@
                                                 <label for="code" class="col-sm-2 col-form-label">Niveau: <span class="text-danger ql-size-huge">*</span></label>
                                                 <div class="col-sm-10">
                                                     <select id="code_niveau" name="code_niveau" class="form-select" required>
-                                                        <option selected="">De quel niveau est la classe ?</option>
+                                                        <option hidden disabled selected="">De quel niveau est la classe ?</option>
                                                         @foreach($niveaux as $niveau)
                                                             <option value="{{$niveau->code}}">{{$niveau->code}}</option>
                                                         @endforeach

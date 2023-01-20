@@ -199,11 +199,18 @@ function getFormValueOf(key){
 
 function submitUeForm(){
     const classe = getFormValueOf('code_classe');
-    if(ueFormElt.checkValidity() && (classe !== '')){
+    const tp_optionnel = getFormValueOf('tp_optionel');
+    const ue_optionnelle = getFormValueOf('ue_optionelle');
+    const semestre = getFormValueOf('semestre');
+    if(ueFormElt.checkValidity() && (classe !== '' && semestre !== '' && tp_optionnel !== '' && ue_optionnelle !== '')){
         addUeToList({
             code: getFormValueOf('code')?.toUpperCase(),
             intitule: getFormValueOf('intitule'),
             code_classe: classe?.toUpperCase(),
+            semestre: semestre,
+            tp_optionel: Boolean(tp_optionnel),
+            ue_optionelle: Boolean(ue_optionnelle),
+            credit: getFormValueOf('credit')
         });
         ueFormElt.reset();
     }
@@ -235,7 +242,7 @@ function removeUeFromList(ueId, ueCode = ''){
 function setUesListTableContent(){
     uesList.sort((a, b) => a.code.localeCompare(b.code));
 
-    const noData = `<tr><td colspan="5" style="text-align: center; font-style: italic;">Aucune ue ajoutée !</td></tr>`;
+    const noData = `<tr><td colspan="9" style="text-align: center; font-style: italic;">Aucune ue ajoutée !</td></tr>`;
     const result = uesList.map((ue, index) =>{
         return `
             <tr>
@@ -243,6 +250,10 @@ function setUesListTableContent(){
                 <td>${ue.code}</td>
                 <td>${ue.intitule}</td>
                 <td>${ue.code_classe}</td>
+                <td>${ue.semestre}</td>
+                <td>${ue.credit}</td>
+                <td>${ue.ue_optionelle ? 'OUI' : 'NON'}</td>
+                <td>${ue.tp_optionel ? 'NON' : 'OUI'}</td>
                 <td>
                     <button onclick="removeUeFromList('${ue.id}', '${ue.code}')" class="btn btn-danger btn-sm" title="Retirer l'ue ${ue.code}">
                        <i class="bi bi-trash-fill"></i>
@@ -369,7 +380,7 @@ function makeFirstInitialisation(response){
 function setStoredDataListContent(){
     storedUesList.sort((a, b) => a.code.localeCompare(b.code));
 
-    const noData = `<tr><td colspan="5" style="text-align: center; font-style: italic;">Aucune ue importée !</td></tr>`;
+    const noData = `<tr><td colspan="9" style="text-align: center; font-style: italic;">Aucune ue importée !</td></tr>`;
     const result = storedUesList.map((ue, index) =>{
         return `
             <tr>
@@ -377,6 +388,10 @@ function setStoredDataListContent(){
                 <td>${ue.code}</td>
                 <td>${ue.intitule}</td>
                 <td>${ue.classe?.code}</td>
+                <td>${ue.semestre}</td>
+                <td>${ue.credit}</td>
+                <td>${(ue.ue_optionelle === 1 ) ? 'OUI' : 'NON'}</td>
+                <td>${(ue.tp_optionel === 1) ? 'NON' : 'OUI'}</td>
                 <td>
                     <button class="btn btn-primary btn-sm" title="Editer l'ue ${ue.code}">
                        <i class="bi bi-pen"></i>
