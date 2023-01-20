@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Etudiant;
 use App\Models\Note;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
+use App\Models\UE;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 
 class NoteController extends Controller
 {
@@ -15,7 +20,13 @@ class NoteController extends Controller
      */
     public function index()
     {
-        //
+        $notes = Note::query()->paginate();
+        foreach($notes as $note){
+            $note->etudiant = $note->etudiant()->first();
+            $note->ue = $note->ue()->first();
+        }
+
+        return new Response(json_encode($notes));
     }
 
     /**
@@ -36,7 +47,31 @@ class NoteController extends Controller
      */
     public function store(StoreNoteRequest $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'notes' => 'array',
+            'notes.*.matricule_etudiant' => 'required|exists:etudiants,matricule',
+//            'notes.*.noms_etudiant' => 'required|string|exists:etudiants,noms',
+            'notes.*.code_ue' => 'required|exists:u_e_s,code',
+            'notes.*.note_cc' => 'sometimes|decimal',
+            'notes.*.note_tp' => 'sometimes|decimal',
+            'notes.*.note_sn' => 'sometimes|deciaml',
+        ]);
+
+        if($validator->fails()){
+            abort(400, $validator->errors()->toJson());
+        }
+
+        foreach($request->notes as $note){
+            Note::create([
+                'ue_id' => UE::query()->where('code', $note['code_ue'])->first()->id,
+                'etudiant_id' => Etudiant::query()->where('matricule', $note['matricule_etudiant'])->first()->id,
+                'cc' => $note['note_cc'] ?? null,
+                'tp' => $note['note_tp'] ?? null,
+                'sn' => $note['note_sn'] ?? null,
+            ]);
+        }
+
+        return Response(json_encode('Les notes ont été enregistrées avec succès !', 201));
     }
 
     /**
@@ -79,8 +114,25 @@ class NoteController extends Controller
      * @param  \App\Models\Note  $note
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Note $note)
+    public function destroy($id)
     {
-        //
+        $searched_note = Note::findOrFail($id);
+        $searched_note->delete();
+
+        return Response(json_encode([
+            'message' => 'La note a été supprimée avec succès !'
+        ]));
+    }
+
+    public function view_index()
+    {
+        $notes = Note::query()->paginate();
+        foreach($notes as $note){
+            $note->etudiant = $note->etudiant()->first();
+            $note->ue = $note->ue()->first();
+        }
+        return View::make('pages.importations.notes', [
+            'notes' => $notes
+        ]);
     }
 }

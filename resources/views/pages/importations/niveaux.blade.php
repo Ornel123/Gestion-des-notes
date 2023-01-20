@@ -7,12 +7,12 @@
 @section('content')
 
     <div class="pagetitle">
-        <h1>Filières</h1>
+        <h1>Niveaux</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{route('home')}}">Accueil</a></li>
                 <li class="breadcrumb-item">Importations</li>
-                <li class="breadcrumb-item active">Filières</li>
+                <li class="breadcrumb-item active">Niveaux</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -55,7 +55,7 @@
                             <button onclick="showSummaryContainer()" style="position: absolute; right: 0;" class="btn btn-outline-danger btn-sm">
                                 <i class="bi bi-arrow-left-square"></i>
                             </button>
-                            Filières importées
+                            Niveaux importés
                         </h5>
 
                         <div class="row">
@@ -70,7 +70,7 @@
                                         <th scope="col">Actions</th>
                                     </tr>
                                     </thead>
-                                    <tbody id="stored-sectors-result">
+                                    <tbody id="stored-levels-result">
 
                                     </tbody>
                                 </table>
@@ -130,12 +130,12 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane fade mt-3" id="bordered-justified-profile" role="tabpanel" aria-labelledby="import-by-form-tab">
-                                    <form onsubmit="return false" class="row d-flex justify-content-center needs-validation" id="sector-form" novalidate>
+                                    <form onsubmit="return false" class="row d-flex justify-content-center needs-validation" id="level-form" novalidate>
                                         <div class="col-md-7">
                                             <div class="row mb-3">
                                                 <label for="code" class="col-sm-2 col-form-label">Code: <span class="text-danger ql-size-huge">*</span></label>
                                                 <div class="col-sm-10">
-                                                    <input required minlength="2" maxlength="15" id="code" name="code" type="text" class="form-control" placeholder="Code de la filière">
+                                                    <input required minlength="2" maxlength="15" id="code" name="code" type="text" class="form-control" placeholder="Code du niveau">
                                                     <div class="invalid-feedback">
                                                         Le code est requis et doit comprendre entre 2 et 15 caractères !
                                                     </div>
@@ -144,7 +144,7 @@
                                             <div class="row mb-3">
                                                 <label for="code" class="col-sm-2 col-form-label">Intitulé: <span class="text-danger ql-size-huge">*</span></label>
                                                 <div class="col-sm-10">
-                                                    <input required minlength="3" maxlength="60" id="intitule" name="intitule" type="text" class="form-control" placeholder="Intitulé de la filière">
+                                                    <input required minlength="3" maxlength="60" id="intitule" name="intitule" type="text" class="form-control" placeholder="Intitulé du niveau">
                                                     <div class="invalid-feedback">
                                                         L'intitulé est requis et doit comprendre entre 3 et 60 caractères !
                                                     </div>
@@ -152,7 +152,7 @@
                                             </div>
 
                                             <div class="d-flex justify-content-center">
-                                                <button onclick="submitSectorForm()" type="submit" class="btn btn-outline-primary">Ajouter</button>
+                                                <button onclick="submitLevelForm()" type="submit" class="btn btn-outline-primary">Ajouter</button>
                                             </div>
                                         </div>
                                     </form>
@@ -177,7 +177,7 @@
                                             <th scope="col">Retirer</th>
                                         </tr>
                                         </thead>
-                                        <tbody id="sectors-result">
+                                        <tbody id="levels-result">
 
                                         </tbody>
                                     </table>
@@ -203,9 +203,9 @@
 
 @section('customs-scripts')
     <script src="{{ asset('assets/js/share.js') }}"></script>
-    <script src="{{ asset('assets/js/importations/filieres.js') }}"></script>
+    <script src="{{ asset('assets/js/importations/niveaux.js') }}"></script>
     <script>
-        console.log({!! json_encode($filieres) !!});
-        makeFirstInitialisation({!! json_encode($filieres) !!});
+        console.log({!! json_encode($niveaux) !!});
+        makeFirstInitialisation({!! json_encode($niveaux) !!});
     </script>
 @endsection

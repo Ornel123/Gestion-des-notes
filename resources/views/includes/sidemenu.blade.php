@@ -18,27 +18,27 @@
                 </a>
             </li>
             <li>
-                <a href="components-accordion.html">
+                <a href="{{ route('niveaux') }}">
                     <i class="bi bi-circle"></i><span>Niveaux</span>
                 </a>
             </li>
             <li>
-                <a href="components-badges.html">
+                <a href="{{ route('classes') }}">
                     <i class="bi bi-circle"></i><span>Classes</span>
                 </a>
             </li>
             <li>
-                <a href="components-breadcrumbs.html">
+                <a href="{{ route('ues') }}">
                     <i class="bi bi-circle"></i><span>UEs</span>
                 </a>
             </li>
             <li>
-                <a href="components-buttons.html">
+                <a href="{{ route('etudiants') }}">
                     <i class="bi bi-circle"></i><span>Etudiants</span>
                 </a>
             </li>
             <li>
-                <a href="components-cards.html">
+                <a href="{{ route('notes') }}">
                     <i class="bi bi-circle"></i><span>Notes</span>
                 </a>
             </li>

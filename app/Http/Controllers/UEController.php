@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classe;
 use App\Models\UE;
 use App\Http\Requests\StoreUERequest;
 use App\Http\Requests\UpdateUERequest;
+use http\Env\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 
 class UEController extends Controller
 {
@@ -15,7 +20,12 @@ class UEController extends Controller
      */
     public function index()
     {
-        //
+        $ues = UE::query()->paginate();
+        foreach($ues as $ue){
+            $ue->classe = $ue->classe()->first();
+        }
+
+        return new Response(json_encode($ues));
     }
 
     /**
@@ -34,9 +44,32 @@ class UEController extends Controller
      * @param  \App\Http\Requests\StoreUERequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreUERequest $request)
+    public function store(\Illuminate\Http\Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'ues' => 'array',
+            'ues.*.code' => 'required|string|between:2,15|unique:u_e_s,code',
+            'ues.*.code_classe' => 'required|string|between:2,15|exists:classes,code',
+            'ues.*.intitule' => 'required|string|between:3,60',
+        ]);
+
+        if($validator->fails()){
+            abort(400, $validator->errors()->toJson());
+        }
+
+        foreach($request->ues as $ue){
+            UE::create([
+                'code' => $ue['code'],
+                'intitule' => $ue['intitule'],
+                'classe_id' => Classe::query()->where('code', $ue['code_classe'])->first()->id,
+                'semestre' => 1,
+                'credit' => 4,
+                'ue_optionelle' => false,
+                'tp_optionel' => false
+            ]);
+        }
+
+        return Response(json_encode('Les UEs ont été enregistrées avec succès !', 201));
     }
 
     /**
@@ -79,8 +112,26 @@ class UEController extends Controller
      * @param  \App\Models\UE  $uE
      * @return \Illuminate\Http\Response
      */
-    public function destroy(UE $uE)
+    public function destroy($id)
     {
-        //
+        $searched_ue = UE::findOrFail($id);
+        $searched_ue->delete();
+
+        return Response(json_encode([
+            'message' => 'L\'UE a été supprimée avec succès !'
+        ]));
+    }
+
+    public function view_index()
+    {
+        $classes = Classe::all();
+        $ues = UE::query()->paginate();
+        foreach($ues as $ue){
+            $ue->classe = $ue->classe()->first();
+        }
+        return View::make('pages.importations.ues', [
+            'classes' => $classes,
+            'ues' => $ues,
+        ]);
     }
 }

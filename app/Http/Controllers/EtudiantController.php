@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classe;
 use App\Models\Etudiant;
 use App\Http\Requests\StoreEtudiantRequest;
 use App\Http\Requests\UpdateEtudiantRequest;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 
 class EtudiantController extends Controller
 {
@@ -15,7 +19,12 @@ class EtudiantController extends Controller
      */
     public function index()
     {
-        //
+        $etudiants = Etudiant::query()->paginate();
+        foreach($etudiants as $etd){
+            $etd->classe = $etd->classe()->first();
+        }
+
+        return new Response(json_encode($etudiants));
     }
 
     /**
@@ -36,7 +45,26 @@ class EtudiantController extends Controller
      */
     public function store(StoreEtudiantRequest $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'etudiants' => 'array',
+            'etudiants.*.code' => 'required|string|between:2,15|unique:ues,code',
+            'etudiants.*.code_classe' => 'required|string|between:2,15|exists:classes,code',
+            'etudiants.*.intitule' => 'required|string|between:3,60',
+        ]);
+
+        if($validator->fails()){
+            abort(400, $validator->errors()->toJson());
+        }
+
+        foreach($request->etudiants as $etd){
+            Etudiant::create([
+                'code' => $etd['code'],
+                'intitule' => $etd['intitule'],
+                'classe_id' => Classe::query()->where('code', $etd['code_classe'])->first()->id,
+            ]);
+        }
+
+        return Response(json_encode('Les étudiants ont été enregistrés avec succès !', 201));
     }
 
     /**
@@ -79,8 +107,26 @@ class EtudiantController extends Controller
      * @param  \App\Models\Etudiant  $etudiant
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Etudiant $etudiant)
+    public function destroy($id)
     {
-        //
+        $searched_etd = Etudiant::findOrFail($id);
+        $searched_etd->delete();
+
+        return Response(json_encode([
+            'message' => 'L\'étudiant a été supprimé avec succès !'
+        ]));
+    }
+
+    public function view_index()
+    {
+        $classes = Classe::all();
+        $etudiants = Etudiant::query()->paginate();
+        foreach($etudiants as $etd){
+            $etd->classe = $etd->classe()->first();
+        }
+        return View::make('pages.importations.etudiants', [
+            'classes' => $classes,
+            'etudiants' => $etudiants,
+        ]);
     }
 }

@@ -9,15 +9,13 @@ const progressComponent = document.getElementById("progress-component");
 const importedFileNameElt = document.getElementById("imported-file-name");
 const fileNameElt = document.getElementById("file-name");
 
-const sectorCodeInput = document.getElementById("code");
-const sectorFormElt = document.getElementById("sector-form");
-const sectorEntitledInput = document.getElementById("intitule");
+const classeFormElt = document.getElementById("classe-form");
 
 const errorDiv = document.getElementById("required-error");
 const errorTextSpan = document.getElementById("error-text");
 
-const sectorsResultElt= document.getElementById("sectors-result");
-const storedSectorsResultElt= document.getElementById("stored-sectors-result");
+const classesResultElt= document.getElementById("classes-result");
+const storedClassesResultElt= document.getElementById("stored-classes-result");
 
 const importButton = document.getElementById('import-button');
 const importLoaderElt = document.getElementById('import-loader');
@@ -31,8 +29,8 @@ const loadingContainer = document.getElementById('loading-container');
 const pageLoaderContainer = document.getElementById('page-loader');
 const loadingHasFailedContainer = document.getElementById('loading-has-failed');
 
-let sectorsList = [];
-let storedSectorsList = [];
+let classesList = [];
+let storedClassesList = [];
 
 let file = null;
 let progress = 0;
@@ -46,7 +44,7 @@ let paginationData = {
     itemsPerPage: 0
 }
 
-setSectorsListTableContent();
+setClassesListTableContent();
 
 browseButton.onclick = ()=>{
     uploadInput.click();
@@ -165,9 +163,13 @@ function readFile(){
                         if(index > 0 && row !== ""){
                             const code = row.split(";")[0].replace("\r", "").replace("\t", "");
                             const intitule = row.split(";")[1].replace("\r", "").replace("\t", "");
-                            addSectorToList({
+                            const filiere = row.split(";")[2].replace("\r", "").replace("\t", "");
+                            const niveau = row.split(";")[3].replace("\r", "").replace("\t", "");
+                            addClasseToList({
                                 code: code,
-                                intitule: intitule
+                                intitule: intitule,
+                                code_filiere: filiere.toUpperCase(),
+                                code_niveau: niveau.toUpperCase()
                             }, (index === (list.length-1)));
                         }
                     }
@@ -194,54 +196,60 @@ function removeFile()
 }
 
 function getFormValueOf(key){
-    return sectorFormElt.elements.namedItem(key)?.value;
+    return classeFormElt.elements.namedItem(key)?.value;
 }
 
-function submitSectorForm(){
-    if(sectorFormElt.checkValidity()){
-        addSectorToList({
+function submitClasseForm(){
+    const filiere = getFormValueOf('code_filiere');
+    const niveau = getFormValueOf('code_niveau');
+    if(classeFormElt.checkValidity() && (filiere !== '' && niveau !== '')){
+        addClasseToList({
             code: getFormValueOf('code')?.toUpperCase(),
-            intitule: getFormValueOf('intitule')
+            intitule: getFormValueOf('intitule'),
+            code_filiere: filiere.toUpperCase(),
+            code_niveau: niveau.toUpperCase(),
         });
-        sectorFormElt.reset();
+        classeFormElt.reset();
     }
     else{
         showErrorToast('Formulaire invalide !');
     }
 }
 
-function addSectorToList(sectorData, shouldRefreshList = true){
-    sectorsList.push({
+function addClasseToList(classeData, shouldRefreshList = true){
+    classesList.push({
         id: generateUniqueId(),
-        ...sectorData
+        ...classeData
     });
     if(shouldRefreshList){
-        setSectorsListTableContent();
+        setClassesListTableContent();
     }
 }
 
-function removeSectorFromList(sectorId, sectorCode = ''){
-    askConfirmation(`Confirmer-vous le retrait de ${sectorCode !== '' ? ('la filière' + sectorCode) : ' de cette filière'} de la liste à importer ?`)
+function removeClasseFromList(classeId, classeCode = ''){
+    askConfirmation(`Confirmer-vous le retrait de ${classeCode !== '' ? ('la classe' + classeCode) : ' de cette classe'} de la liste à importer ?`)
         .then((confirmationState) =>{
             if(confirmationState){
-                sectorsList = sectorsList.filter(elt => elt.id !== sectorId);
-                setSectorsListTableContent();
+                classesList = classesList.filter(elt => elt.id !== classeId);
+                setClassesListTableContent();
             }
         })
 }
 
-function setSectorsListTableContent(){
-    sectorsList.sort((a, b) => a.code.localeCompare(b.code));
+function setClassesListTableContent(){
+    classesList.sort((a, b) => a.code.localeCompare(b.code));
 
-    const noData = `<tr><td colspan="4" style="text-align: center; font-style: italic;">Aucune filière ajoutée !</td></tr>`;
-    const result = sectorsList.map((sector, index) =>{
+    const noData = `<tr><td colspan="6" style="text-align: center; font-style: italic;">Aucune classe ajoutée !</td></tr>`;
+    const result = classesList.map((classe, index) =>{
         return `
             <tr>
                 <td>${index + 1}</td>
-                <td>${sector.code}</td>
-                <td>${sector.intitule}</td>
+                <td>${classe.code}</td>
+                <td>${classe.intitule}</td>
+                <td>${classe.code_filiere}</td>
+                <td>${classe.code_niveau}</td>
                 <td>
-                    <button onclick="removeSectorFromList('${sector.id}', '${sector.code}')" class="btn btn-danger btn-sm" title="Retirer la filière ${sector.code}">
+                    <button onclick="removeClasseFromList('${classe.id}', '${classe.code}')" class="btn btn-danger btn-sm" title="Retirer la classe ${classe.code}">
                        <i class="bi bi-trash-fill"></i>
                     </button>
                 </td>
@@ -250,15 +258,15 @@ function setSectorsListTableContent(){
     });
 
     setImportButtonState()
-    sectorsResultElt.innerHTML = result.length > 0 ? result.join('') : noData;
+    classesResultElt.innerHTML = result.length > 0 ? result.join('') : noData;
 }
 
 function setImportButtonState(){
-    importButton.disabled = sectorsList.length === 0;
+    importButton.disabled = classesList.length === 0;
 }
 
 function onImport(){
-    if(sectorsList.length > 0){
+    if(classesList.length > 0){
         showImportLoader();
         const xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function(){
@@ -266,24 +274,24 @@ function onImport(){
             if(this.readyState === 4){
                 if(this.status >= 200 && this.status < 300){
                     const result = this.responseText;
-                    showSuccessToast('Les filières ont été importées avec succès !');
-                    sectorsList = [];
-                    setSectorsListTableContent();
+                    showSuccessToast('Les classes ont été importées avec succès !');
+                    classesList = [];
+                    setClassesListTableContent();
                     console.log(result);
                 }
                 else{
-                    showErrorToast('Une erreur s\'est produite lors de l\'importation des filières ! Veuillez réessayer !');
+                    showErrorToast('Une erreur s\'est produite lors de l\'importation des classes ! Veuillez réessayer !');
                 }
                 hideImportLoader();
             }
         }
 
-        xmlhttp.open('POST', '/api/filieres', true);
+        xmlhttp.open('POST', '/api/classes', true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.send(JSON.stringify({filieres: sectorsList}));
+        xmlhttp.send(JSON.stringify({classes: classesList}));
     }
     else{
-        showWarningToast('Aucune filière à ajouter !');
+        showWarningToast('Aucune classe à ajouter !');
         setImportButtonState();
     }
 }
@@ -317,7 +325,7 @@ function showSummaryContainer(){
     importContainer.classList.add('visually-hidden');
     summaryContainer.classList.remove('visually-hidden');
     storedDataContainer.classList.add('visually-hidden');
-    if(storedSectorsList.length > 0){
+    if(storedClassesList.length > 0){
         summaryWithDataContainer.classList.remove('visually-hidden');
         summaryWithoutDataContainer.classList.add('visually-hidden');
     }
@@ -358,27 +366,28 @@ function makeFirstInitialisation(response){
         totalItems: response.total,
         totalPages: response.last_page
     }
-    storedSectorsList = response.data;
+    storedClassesList = response.data;
 
     showSummaryContainer();
 }
 
 function setStoredDataListContent(){
-    storedSectorsList.sort((a, b) => a.code.localeCompare(b.code));
+    storedClassesList.sort((a, b) => a.code.localeCompare(b.code));
 
-    const noData = `<tr><td colspan="4" style="text-align: center; font-style: italic;">Aucune filière importée !</td></tr>`;
-    const result = storedSectorsList.map((sector, index) =>{
+    const noData = `<tr><td colspan="6" style="text-align: center; font-style: italic;">Aucune classe importée !</td></tr>`;
+    const result = storedClassesList.map((classe, index) =>{
         return `
             <tr>
-                <td>${sector.id}</td>
-                <td>${sector.code}</td>
-                <td>${sector.intitule}</td>
-                <td>${sector.nombre_classes}</td>
+                <td>${classe.id}</td>
+                <td>${classe.code}</td>
+                <td>${classe.intitule}</td>
+                <td>${classe.filiere?.code}</td>
+                <td>${classe.niveau?.code}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm" title="Editer la filière ${sector.code}">
+                    <button class="btn btn-primary btn-sm" title="Editer la classe ${classe.code}">
                        <i class="bi bi-pen"></i>
                     </button>
-                    <button onclick="deleteStoredSector('${sector.id}', '${sector.code}')" class="btn btn-danger btn-sm" title="Supprimer la filière ${sector.code}">
+                    <button onclick="deleteStoredClasse('${classe.id}', '${classe.code}')" class="btn btn-danger btn-sm" title="Supprimer la classe ${classe.code}">
                        <i class="bi bi-trash-fill"></i>
                     </button>
                 </td>
@@ -386,20 +395,20 @@ function setStoredDataListContent(){
         `;
     });
 
-    storedSectorsResultElt.innerHTML = result.length > 0 ? result.join('') : noData;
+    storedClassesResultElt.innerHTML = result.length > 0 ? result.join('') : noData;
 }
 
-function deleteStoredSector(sectorId, sectorCode){
+function deleteStoredClasse(classeId, classeCode){
     Swal.fire({
         title: 'Demande de confirmation',
-        text: 'Confirmez-vous la suppression de la filière '+ sectorCode + ' ? NB: Cette action est irreversible !',
+        text: 'Confirmez-vous la suppression de la classe '+ classeCode + ' ? NB: Cette action est irreversible !',
         showCancelButton: true,
         icon: 'warning',
         cancelButtonText: 'Annuler',
         confirmButtonText: 'Oui, supprimer',
         showLoaderOnConfirm: true,
         preConfirm: () => {
-            return fetch(`/api/filieres/${sectorId}`, {method: 'DELETE'})
+            return fetch(`/api/classes/${classeId}`, {method: 'DELETE'})
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(response.statusText)
@@ -408,15 +417,15 @@ function deleteStoredSector(sectorId, sectorCode){
                 })
                 .catch(error => {
                     Swal.showValidationMessage(
-                        `Une erreur s'est produite lors de la suppression de la filière ${sectorCode} ! Veuillez réessayer !`
+                        `Une erreur s'est produite lors de la suppression de la classe ${classeCode} ! Veuillez réessayer !`
                     )
                 })
         },
         allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
         if (result.isConfirmed) {
-            showSuccessToast(`La filière ${sectorCode} a été supprimée avec succès !`);
-            storedSectorsList = storedSectorsList.filter(elt => (''+elt.id) !== (''+sectorId));
+            showSuccessToast(`La classe ${classeCode} a été supprimée avec succès !`);
+            storedClassesList = storedClassesList.filter(elt => (''+elt.id) !== (''+classeId));
             setStoredDataListContent();
         }
     });

@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\ClasseController;
+use App\Http\Controllers\EtudiantController;
 use App\Http\Controllers\FiliereController;
+use App\Http\Controllers\NiveauController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\UEController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +25,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('filieres', FiliereController::class);
+Route::resource('niveaux', NiveauController::class);
+Route::resource('classes', ClasseController::class);
+Route::resource('etudiants', EtudiantController::class);
+Route::resource('ues', UEController::class);
+Route::resource('notes', NoteController::class);

@@ -22,10 +22,10 @@ class Classe extends Model
 
     public function filiere()
     {
-        return $this->belongsTo(Filiere::class)->first();
+        return $this->belongsTo(Filiere::class);
     }
 
-    public function niveaux()
+    public function niveau()
     {
         return $this->belongsTo(Niveau::class);
     }
